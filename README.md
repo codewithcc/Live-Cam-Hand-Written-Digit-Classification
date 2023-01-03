@@ -1,1 +1,0 @@
-# Live-Cam-Hand-Written-Digit-Recognizer
