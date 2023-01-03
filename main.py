@@ -2,7 +2,7 @@
 Project : Live Cam Hand-Written Digit Classification
 Developer : Chanchal Roy
 Date : 1st Jan 2023
-GitHub : https://github.com/Chexa12cc/Live-Cam-Hand-Written-Digit-Recognizer
+GitHub : https://github.com/Chexa12cc/Live-Cam-Hand-Written-Digit-Classification
 """
 
 # ========== Modules Needed ==========
@@ -23,6 +23,7 @@ pad = 100
 timeS = 0
 timeE = 0
 train = False
+myFile = r'ModelCNN.h5'
 
 # ========== Functions ==========
 def start_cam(cam_id: int = 0, cam_width: int = 640, cam_height: int = 360) -> object:
@@ -35,7 +36,7 @@ def start_cam(cam_id: int = 0, cam_width: int = 640, cam_height: int = 360) -> o
 
     It returns the camera object.
     """
-    cam = cv2.VideoCapture(0, 700)
+    cam = cv2.VideoCapture(cam_id, 700)
     cam.set(3, cam_width)
     cam.set(4, cam_height)
     cam.set(5, 30)
@@ -51,16 +52,21 @@ def start_training(file_path: str) -> bool:
     Returns True else False if any exception occurs.
     """
     try:
+        # ========== Data Loading ==========
         print('Starting the Training...')
 
-        (trainX, trainY), (testX, testY) = kr.datasets.mnist.load_data()
+        (trainX, trainY), (testX, testY) = kr.datasets.mnist.load_data() # Loads the dataset (keras MNIST has 28X28 image data)
 
+        # ========== Data Pre-processing ==========
+        # Normalize the values between 0 and 1
         trainX = trainX / 255
         testX = testX / 255
 
+        # Reshaping the data into (1, 28, 28, 1)
         trainX = trainX.reshape(trainX.shape[0], trainX.shape[1], trainX.shape[2], 1)
         testX = testX.reshape(testX.shape[0], testX.shape[1], testX.shape[2], 1)
 
+        # Creating a Data Generator
         dataGen = kr.preprocessing.image.ImageDataGenerator(
             width_shift_range=.1,
             height_shift_range=.1,
@@ -71,6 +77,8 @@ def start_training(file_path: str) -> bool:
         dataGen.fit(trainX)
         trainY = kr.utils.to_categorical(trainY, 10)
 
+        # ========== Model Creation ==========
+        # Creating the CNN model
         model = kr.Sequential([
             kr.layers.Conv2D(input_shape=(28, 28, 1), filters=32, kernel_size=(3, 3), activation='relu'),
             kr.layers.MaxPooling2D((2, 2)),
@@ -86,10 +94,12 @@ def start_training(file_path: str) -> bool:
             metrics=['accuracy']
         )
 
-        model.summary()
+        model.summary() # Gets the architecture of the CNN
 
-        model.fit(dataGen.flow(trainX, trainY), epochs=10)
+        model.fit(dataGen.flow(trainX, trainY), epochs=10) # Starts training
 
+        # ========== Model Saving / Loading ==========
+        # Saving the model
         try:
             model.save(file_path)
             print('\nModel saved successfully!\n')
@@ -97,6 +107,8 @@ def start_training(file_path: str) -> bool:
             print('\nError occurred during saving the model!\n')
             return False
 
+        # ========== Model Testing ==========
+        # Loading the model
         try:
             model = kr.models.load_model(file_path)
             print('\nModel loaded successfully!\n')
@@ -104,20 +116,25 @@ def start_training(file_path: str) -> bool:
             print('\nError occurred during loading the model!\n')
             return False
 
+        # One hot encoding
         testY = LabelBinarizer().fit_transform(testY)
 
+        # Checking model performence
         modelResult = model.evaluate(testX, testY, verbose=0)
         print(f'\nModel Loss : {modelResult[0]} | Model Accuracy : {modelResult[1]}\n')
 
+        # Checking Prediction
         predict = model.predict(testX[0].reshape(1, 28, 28, 1))
         pred_class = [np.argmax(i) for i in predict][0]
         print(f'\nOriginal : {testY[0]} | Prediction : {pred_class}\n')
+
         return True
+    
     except Exception as ex:
         print(f'\nError! {ex}\n')
         return False
 
-def start_recognizing(file_name: str) -> None:
+def start_recognizing(file_path: str) -> None:
     """
     Starts the recognition.
 
@@ -129,7 +146,7 @@ def start_recognizing(file_name: str) -> None:
         global timeS, timeE
         # ========== Model Loading ==========
         try:
-            model_nn = kr.models.load_model(r'ModelANN.h5')
+            model_nn = kr.models.load_model(file_path)
             print('\nModel loaded successfully!\n')
         except:
             print('\nError occurred during loading the model!\n')
@@ -198,8 +215,8 @@ if __name__ == '__main__':
     else: train = False
 
     if train:
-        start_training(r'ModelANN.h5')
+        start_training(myFile)
         train = False
 
     if not train:
-        start_recognizing(r'modelANN.h5')
+        start_recognizing(myFile)
