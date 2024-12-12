@@ -63,7 +63,7 @@ Follow these steps to set up the project:
 - **Output Layer:** Predicts one of the 10 digit classes (0-9).
 
 ## Results
-The classifier achieves an accuracy of **XX%** on the MNIST test dataset and performs efficiently in real-time on live video.
+The classifier achieves an accuracy of **96%** on the MNIST test dataset and performs efficiently in real-time on live video.
 
 ## Future Enhancements
 - **Enhance Detection:** Improve preprocessing for better detection of poorly drawn digits.
