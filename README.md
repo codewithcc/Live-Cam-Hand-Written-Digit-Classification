@@ -20,7 +20,7 @@ Follow these steps to set up the project:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/yourusername/hand-digit-classifier.git
+   git clone https://github.com/codewithcc/hand-digit-classifier.git
    cd hand-digit-classifier
    ```
 
@@ -36,7 +36,7 @@ Follow these steps to set up the project:
 4. **Run the Application:**
    Launch the live digit classifier:
    ```bash
-   python app.py
+   python main.py
    ```
 
 ## How It Works
