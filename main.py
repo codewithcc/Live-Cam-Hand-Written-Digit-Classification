@@ -2,13 +2,12 @@
 Project : Live Cam Hand-Written Digit Classification
 Developer : Chanchal Roy
 Date : 1st Jan 2023
-GitHub : https://github.com/Chexa12cc/Live-Cam-Hand-Written-Digit-Classification
+GitHub : https://github.com/codewithcc/Live-Cam-Hand-Written-Digit-Classification
 """
 
 # ========== Modules Needed ==========
 import time as t
 import cv2
-import pickle as pk
 from tensorflow import keras as kr
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer
